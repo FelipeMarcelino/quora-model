@@ -1,0 +1,111 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/3fdf28bc/
+.DEFAULT_GOAL	Makefile	/^.DEFAULT_GOAL := help$/;"	m
+ALLSPHINXOPTS	docs/Makefile	/^ALLSPHINXOPTS   = -d $(BUILDDIR)\/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .$/;"	m
+ALLSPHINXOPTS	docs/make.bat	/^	set ALLSPHINXOPTS=-D latex_paper_size=%PAPER% %ALLSPHINXOPTS%$/;"	v
+ALLSPHINXOPTS	docs/make.bat	/^set ALLSPHINXOPTS=-d %BUILDDIR%\/doctrees %SPHINXOPTS% .$/;"	v
+BUCKET	Makefile	/^BUCKET = [OPTIONAL] your-bucket-for-syncing-data (do not include 's3:\/\/')$/;"	m
+BUILDDIR	docs/Makefile	/^BUILDDIR      = _build$/;"	m
+BUILDDIR	docs/make.bat	/^set BUILDDIR=_build$/;"	v
+Commands	docs/commands.rst	/^Commands$/;"	c
+Getting started	docs/getting-started.rst	/^Getting started$/;"	c
+HAS_CONDA	Makefile	/^HAS_CONDA=False$/;"	m
+HAS_CONDA	Makefile	/^HAS_CONDA=True$/;"	m
+I18NSPHINXOPTS	docs/Makefile	/^I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .$/;"	m
+I18NSPHINXOPTS	docs/make.bat	/^	set I18NSPHINXOPTS=-D latex_paper_size=%PAPER% %I18NSPHINXOPTS%$/;"	v
+I18NSPHINXOPTS	docs/make.bat	/^set I18NSPHINXOPTS=%SPHINXOPTS% .$/;"	v
+Indices and tables	docs/index.rst	/^Indices and tables$/;"	c
+PAPER	docs/Makefile	/^PAPER         =$/;"	m
+PAPER	docs/make.bat	/^	echo.  latex      to make LaTeX files, you can set PAPER=a4 or PAPER=letter$/;"	v
+PAPEROPT_a4	docs/Makefile	/^PAPEROPT_a4     = -D latex_paper_size=a4$/;"	m
+PAPEROPT_letter	docs/Makefile	/^PAPEROPT_letter = -D latex_paper_size=letter$/;"	m
+PROFILE	Makefile	/^PROFILE = default$/;"	m
+PROJECT_DIR	Makefile	/^PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))$/;"	m
+PROJECT_NAME	Makefile	/^PROJECT_NAME = quora-model$/;"	m
+PYTHON_INTERPRETER	Makefile	/^PYTHON_INTERPRETER = python3$/;"	m
+Project Organization	README.md	/^Project Organization$/;"	s
+REQUIRED_PYTHON	test_environment.py	/^REQUIRED_PYTHON = "python3"$/;"	v
+SPHINXBUILD	docs/Makefile	/^SPHINXBUILD   = sphinx-build$/;"	m
+SPHINXBUILD	docs/make.bat	/^	set SPHINXBUILD=sphinx-build$/;"	v
+SPHINXOPTS	docs/Makefile	/^SPHINXOPTS    =$/;"	m
+Syncing data to S3	docs/commands.rst	/^Syncing data to S3$/;"	s	chapter:Commands
+add_word_to_dict	src/features/build_features.py	/^def add_word_to_dict(token,word_dict):$/;"	f
+aws	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/ --profile $(PROFILE)$/;"	t
+aws	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/$/;"	t
+aws	Makefile	/^	aws s3 sync s3:\/\/$(BUCKET)\/data\/ data\/ --profile $(PROFILE)$/;"	t
+aws	Makefile	/^	aws s3 sync s3:\/\/$(BUCKET)\/data\/ data\/$/;"	t
+changes	docs/Makefile	/^changes:$/;"	t
+clean	Makefile	/^clean:$/;"	t
+clean	docs/Makefile	/^clean:$/;"	t
+clean_stopwords	src/features/build_features.py	/^def clean_stopwords(data, input_columnm, output_column=None):$/;"	f
+complexity	tox.ini	/^max-complexity = 10$/;"	k	section:flake8
+create_environment	Makefile	/^create_environment:$/;"	t
+data	Makefile	/^data: requirements$/;"	t
+data/	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/ --profile $(PROFILE)$/;"	t
+data/	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/$/;"	t
+devhelp	docs/Makefile	/^devhelp:$/;"	t
+dirhtml	docs/Makefile	/^dirhtml:$/;"	t
+doctest	docs/Makefile	/^doctest:$/;"	t
+end	docs/make.bat	/^:end$/;"	l
+epub	docs/Makefile	/^epub:$/;"	t
+exclude_patterns	docs/conf.py	/^exclude_patterns = ['_build']$/;"	v
+extensions	docs/conf.py	/^extensions = []$/;"	v
+flake8	tox.ini	/^[flake8]$/;"	s
+gettext	docs/Makefile	/^gettext:$/;"	t
+help	Makefile	/^help:$/;"	t
+help	docs/Makefile	/^help:$/;"	t
+html	docs/Makefile	/^html:$/;"	t
+html_static_path	docs/conf.py	/^html_static_path = ['_static']$/;"	v
+html_theme	docs/conf.py	/^html_theme = 'default'$/;"	v
+htmlhelp	docs/Makefile	/^htmlhelp:$/;"	t
+htmlhelp_basename	docs/conf.py	/^htmlhelp_basename = 'quora-modeldoc'$/;"	v
+indexing_words	src/features/build_features.py	/^def indexing_words(data, word_dict, input_column, output_column=None):$/;"	f
+info	docs/Makefile	/^info:$/;"	t
+json	docs/Makefile	/^json:$/;"	t
+latex	docs/Makefile	/^latex:$/;"	t
+latex_documents	docs/conf.py	/^latex_documents = [$/;"	v
+latex_elements	docs/conf.py	/^latex_elements = {$/;"	v
+latexpdf	docs/Makefile	/^latexpdf:$/;"	t
+length	tox.ini	/^max-line-length = 79$/;"	k	section:flake8
+linkcheck	docs/Makefile	/^linkcheck:$/;"	t
+lint	Makefile	/^lint:$/;"	t
+log_fmt	src/data/make_dataset.py	/^    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'$/;"	v
+main	src/data/make_dataset.py	/^def main(input_filepath, output_filepath):$/;"	f
+main	test_environment.py	/^def main():$/;"	f
+man	docs/Makefile	/^man:$/;"	t
+man_pages	docs/conf.py	/^man_pages = [$/;"	v
+master_doc	docs/conf.py	/^master_doc = 'index'$/;"	v
+pd	src/data/make_dataset.py	/^import pandas as pd$/;"	I
+pickle	docs/Makefile	/^pickle:$/;"	t
+project	docs/conf.py	/^project = u'quora-model'$/;"	v
+project_dir	src/data/make_dataset.py	/^    project_dir = Path(__file__).resolve().parents[2]$/;"	v
+pygments_style	docs/conf.py	/^pygments_style = 'sphinx'$/;"	v
+qthelp	docs/Makefile	/^qthelp:$/;"	t
+quora-model	README.md	/^quora-model$/;"	c
+quora-model documentation!	docs/index.rst	/^quora-model documentation!$/;"	c
+release	docs/conf.py	/^release = '0.1'$/;"	v
+requirements	Makefile	/^requirements: test_environment$/;"	t
+s3	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/ --profile $(PROFILE)$/;"	t
+s3	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/$/;"	t
+s3	Makefile	/^	aws s3 sync s3:\/\/$(BUCKET)\/data\/ data\/ --profile $(PROFILE)$/;"	t
+s3	Makefile	/^	aws s3 sync s3:\/\/$(BUCKET)\/data\/ data\/$/;"	t
+singlehtml	docs/Makefile	/^singlehtml:$/;"	t
+source_suffix	docs/conf.py	/^source_suffix = '.rst'$/;"	v
+stop	src/features/build_features.py	/^stop = stopwords.words('english')$/;"	v
+sync	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/ --profile $(PROFILE)$/;"	t
+sync	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/$/;"	t
+sync	Makefile	/^	aws s3 sync s3:\/\/$(BUCKET)\/data\/ data\/ --profile $(PROFILE)$/;"	t
+sync	Makefile	/^	aws s3 sync s3:\/\/$(BUCKET)\/data\/ data\/$/;"	t
+sync_data_from_s3	Makefile	/^sync_data_from_s3:$/;"	t
+sync_data_to_s3	Makefile	/^sync_data_to_s3:$/;"	t
+templates_path	docs/conf.py	/^templates_path = ['_templates']$/;"	v
+test_environment	Makefile	/^test_environment:$/;"	t
+texinfo	docs/Makefile	/^texinfo:$/;"	t
+texinfo_documents	docs/conf.py	/^texinfo_documents = [$/;"	v
+text	docs/Makefile	/^text:$/;"	t
+version	docs/conf.py	/^version = '0.1'$/;"	v

@@ -2,9 +2,10 @@
 import click
 import logging
 import pandas as pd
+import pickle
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
-from src.features.build_features import clean_stopwords
+from src.features.build_features import clean_stopwords, indexing_words
 
 
 
@@ -17,14 +18,24 @@ def main(input_filepath, output_filepath):
     """
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
-
     data = pd.read_csv(input_filepath)
-    data = clean_stopwords(data,"question1")
-    data = clean_stopwords(data,"question2")
-    logger.info('Cleaned stopwords')
+
+    # logger.info('Cleaning stopwords')
+    # data = clean_stopwords(data,"question1")
+    # data = clean_stopwords(data,"question2")
+    # logger.info('Cleaned stopwords')
+
+    # logger.info('Indexing words')
+    # word_dict = {}
+    # data = indexing_words(data, word_dict, "question1")
+    # data = indexing_words(data, word_dict, "question2")
+    # logger.info('Words indexed')
+
+    # Saving dictionary using pickle
+    # with open('../../data/raw/word_dict.pickle', 'wb') as handle:
+    #     pickle.dump(word_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     logger.info('Saving dataframe')
-    print(data['question1'])
     data.to_csv(output_filepath,index=False)
 
 
