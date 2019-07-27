@@ -20,6 +20,8 @@ scikit-learn = "*"
 gensim = "*"
 pandas = "*"
 nltk = "*"
+matplotlib = "*"
+tqdm = "*"
 
 [requires]
 python_version = "3.7"

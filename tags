@@ -13,6 +13,7 @@ BUCKET	Makefile	/^BUCKET = [OPTIONAL] your-bucket-for-syncing-data (do not inclu
 BUILDDIR	docs/Makefile	/^BUILDDIR      = _build$/;"	m
 BUILDDIR	docs/make.bat	/^set BUILDDIR=_build$/;"	v
 Commands	docs/commands.rst	/^Commands$/;"	c
+F	src/models/model.py	/^import torch.nn.functional as F$/;"	I
 Getting started	docs/getting-started.rst	/^Getting started$/;"	c
 HAS_CONDA	Makefile	/^HAS_CONDA=False$/;"	m
 HAS_CONDA	Makefile	/^HAS_CONDA=True$/;"	m
@@ -29,11 +30,17 @@ PROJECT_DIR	Makefile	/^PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MA
 PROJECT_NAME	Makefile	/^PROJECT_NAME = quora-model$/;"	m
 PYTHON_INTERPRETER	Makefile	/^PYTHON_INTERPRETER = python3$/;"	m
 Project Organization	README.md	/^Project Organization$/;"	s
+QuoraDataset	src/models/create_dataset.py	/^class QuoraDataset(Dataset):$/;"	c
+QuoraModel	src/models/model.py	/^class QuoraModel(nn.Module):$/;"	c
 REQUIRED_PYTHON	test_environment.py	/^REQUIRED_PYTHON = "python3"$/;"	v
 SPHINXBUILD	docs/Makefile	/^SPHINXBUILD   = sphinx-build$/;"	m
 SPHINXBUILD	docs/make.bat	/^	set SPHINXBUILD=sphinx-build$/;"	v
 SPHINXOPTS	docs/Makefile	/^SPHINXOPTS    =$/;"	m
 Syncing data to S3	docs/commands.rst	/^Syncing data to S3$/;"	s	chapter:Commands
+__getitem__	src/models/create_dataset.py	/^    def __getitem__(self, idx):$/;"	m	class:QuoraDataset
+__init__	src/models/create_dataset.py	/^    def __init__(self, data, transform=None):$/;"	m	class:QuoraDataset
+__init__	src/models/model.py	/^    def __init__(self,kernel_sizes, out_channels, stride, hidden_size,layers, embedding_dim,outp/;"	m	class:QuoraModel
+__len__	src/models/create_dataset.py	/^    def __len__(self):$/;"	m	class:QuoraDataset
 add_word_to_dict	src/features/build_features.py	/^def add_word_to_dict(token,word_dict):$/;"	f
 aws	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/ --profile $(PROFILE)$/;"	t
 aws	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/$/;"	t
@@ -43,19 +50,24 @@ changes	docs/Makefile	/^changes:$/;"	t
 clean	Makefile	/^clean:$/;"	t
 clean	docs/Makefile	/^clean:$/;"	t
 clean_stopwords	src/features/build_features.py	/^def clean_stopwords(data, input_columnm, output_column=None):$/;"	f
+columns_report	src/models/train_model.py	/^columns_report = ['epoch','acc','f1_score','loss','auc']$/;"	v
 complexity	tox.ini	/^max-complexity = 10$/;"	k	section:flake8
+count_words	src/features/build_features.py	/^def count_words(data, input_column, output_column=None):$/;"	f
 create_environment	Makefile	/^create_environment:$/;"	t
 data	Makefile	/^data: requirements$/;"	t
 data/	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/ --profile $(PROFILE)$/;"	t
 data/	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/$/;"	t
 devhelp	docs/Makefile	/^devhelp:$/;"	t
+device	src/models/train_model.py	/^device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')$/;"	v
 dirhtml	docs/Makefile	/^dirhtml:$/;"	t
 doctest	docs/Makefile	/^doctest:$/;"	t
 end	docs/make.bat	/^:end$/;"	l
 epub	docs/Makefile	/^epub:$/;"	t
 exclude_patterns	docs/conf.py	/^exclude_patterns = ['_build']$/;"	v
 extensions	docs/conf.py	/^extensions = []$/;"	v
+fix_decimal	src/models/train_model.py	/^fix_decimal = 4$/;"	v
 flake8	tox.ini	/^[flake8]$/;"	s
+forward	src/models/model.py	/^    def forward(self, questions1, q1_lens, questions2,q2_lens, hidden=None):$/;"	m	class:QuoraModel
 gettext	docs/Makefile	/^gettext:$/;"	t
 help	Makefile	/^help:$/;"	t
 help	docs/Makefile	/^help:$/;"	t
@@ -64,6 +76,7 @@ html_static_path	docs/conf.py	/^html_static_path = ['_static']$/;"	v
 html_theme	docs/conf.py	/^html_theme = 'default'$/;"	v
 htmlhelp	docs/Makefile	/^htmlhelp:$/;"	t
 htmlhelp_basename	docs/conf.py	/^htmlhelp_basename = 'quora-modeldoc'$/;"	v
+index_file_model	src/models/train_model.py	/^index_file_model = "..\/..\/reports\/index.csv"$/;"	v
 indexing_words	src/features/build_features.py	/^def indexing_words(data, word_dict, input_column, output_column=None):$/;"	f
 info	docs/Makefile	/^info:$/;"	t
 json	docs/Makefile	/^json:$/;"	t
@@ -76,12 +89,23 @@ linkcheck	docs/Makefile	/^linkcheck:$/;"	t
 lint	Makefile	/^lint:$/;"	t
 log_fmt	src/data/make_dataset.py	/^    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'$/;"	v
 main	src/data/make_dataset.py	/^def main(input_filepath, output_filepath):$/;"	f
+main	src/models/train_model.py	/^def main(input_filepath,model_name,frac_sample,test_frac,batch_size, epochs, learning_rate):$/;"	f
 main	test_environment.py	/^def main():$/;"	f
 man	docs/Makefile	/^man:$/;"	t
 man_pages	docs/conf.py	/^man_pages = [$/;"	v
 master_doc	docs/conf.py	/^master_doc = 'index'$/;"	v
+models_folder	src/models/train_model.py	/^models_folder = "..\/..\/models\/"$/;"	v
+nn	src/models/model.py	/^import torch.nn as nn$/;"	I
+nn	src/models/train_model.py	/^import torch.nn as nn$/;"	I
+np	src/features/build_features.py	/^import numpy as np$/;"	I
+np	src/models/create_dataset.py	/^import numpy as np$/;"	I
+np	src/models/train_model.py	/^import numpy as np$/;"	I
+padding	src/features/build_features.py	/^def padding(data,max_length, input_column, output_column=None):$/;"	f
 pd	src/data/make_dataset.py	/^import pandas as pd$/;"	I
+pd	src/models/create_dataset.py	/^import pandas as pd$/;"	I
+pd	src/models/train_model.py	/^import pandas as pd$/;"	I
 pickle	docs/Makefile	/^pickle:$/;"	t
+plt	src/models/train_model.py	/^import matplotlib.pyplot as plt$/;"	I
 project	docs/conf.py	/^project = u'quora-model'$/;"	v
 project_dir	src/data/make_dataset.py	/^    project_dir = Path(__file__).resolve().parents[2]$/;"	v
 pygments_style	docs/conf.py	/^pygments_style = 'sphinx'$/;"	v
@@ -89,11 +113,14 @@ qthelp	docs/Makefile	/^qthelp:$/;"	t
 quora-model	README.md	/^quora-model$/;"	c
 quora-model documentation!	docs/index.rst	/^quora-model documentation!$/;"	c
 release	docs/conf.py	/^release = '0.1'$/;"	v
+report_figure_folder	src/models/train_model.py	/^report_figure_folder = "..\/..\/reports\/figures\/"$/;"	v
+report_folder	src/models/train_model.py	/^report_folder = "..\/..\/reports\/"$/;"	v
 requirements	Makefile	/^requirements: test_environment$/;"	t
 s3	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/ --profile $(PROFILE)$/;"	t
 s3	Makefile	/^	aws s3 sync data\/ s3:\/\/$(BUCKET)\/data\/$/;"	t
 s3	Makefile	/^	aws s3 sync s3:\/\/$(BUCKET)\/data\/ data\/ --profile $(PROFILE)$/;"	t
 s3	Makefile	/^	aws s3 sync s3:\/\/$(BUCKET)\/data\/ data\/$/;"	t
+save_model	src/models/train_model.py	/^def save_model(model, optim, epoch, loss, learning_rate, model_name):$/;"	f
 singlehtml	docs/Makefile	/^singlehtml:$/;"	t
 source_suffix	docs/conf.py	/^source_suffix = '.rst'$/;"	v
 stop	src/features/build_features.py	/^stop = stopwords.words('english')$/;"	v
@@ -105,7 +132,11 @@ sync_data_from_s3	Makefile	/^sync_data_from_s3:$/;"	t
 sync_data_to_s3	Makefile	/^sync_data_to_s3:$/;"	t
 templates_path	docs/conf.py	/^templates_path = ['_templates']$/;"	v
 test_environment	Makefile	/^test_environment:$/;"	t
+test_model	src/models/train_model.py	/^def test_model(test, model, criterion):$/;"	f
 texinfo	docs/Makefile	/^texinfo:$/;"	t
 texinfo_documents	docs/conf.py	/^texinfo_documents = [$/;"	v
 text	docs/Makefile	/^text:$/;"	t
+train_model	src/models/train_model.py	/^def train_model(train, test, model, epochs, learning_rate, model_name, date, batch_size, sample_/;"	f
+truncate	src/models/train_model.py	/^def truncate(number, digits) -> float:$/;"	f
 version	docs/conf.py	/^version = '0.1'$/;"	v
+write_to_index	src/models/train_model.py	/^def write_to_index(dict_index):$/;"	f
