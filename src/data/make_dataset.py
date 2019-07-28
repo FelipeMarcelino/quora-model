@@ -8,6 +8,8 @@ from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 from src.features.build_features import clean_stopwords, indexing_words, count_words, padding
 
+pd.options.mode.chained_assignment = None  # default='warn'
+
 @click.command()
 @click.argument('input_filepath', type=click.Path(exists=True))
 @click.argument('output_filepath', type=click.Path())
@@ -22,7 +24,6 @@ def main(input_filepath, output_filepath):
     logger.info('Cleaning stopwords')
     data = clean_stopwords(data,"question1")
     data = clean_stopwords(data,"question2")
-    print(data["question1"])
     logger.info('Cleaned stopwords')
 
 
@@ -32,7 +33,6 @@ def main(input_filepath, output_filepath):
     data = indexing_words(data, word_dict, "question2")
     logger.info('Words indexed')
 
-    print(data["question1"])
 
     # Saving dictionary using pickle
     with open('../../data/raw/word_dict.pickle', 'wb') as handle:
@@ -42,7 +42,6 @@ def main(input_filepath, output_filepath):
     data = count_words(data,"question1","q1_len")
     data = count_words(data,"question2","q2_len")
     logger.info('Words counted')
-    print(data["q1_len"])
 
     # Remove outliers question bigger than 20 and equal 0
     logger.info('Padding')
@@ -57,7 +56,6 @@ def main(input_filepath, output_filepath):
     data = padding(data,max_length,"question1")
     data = padding(data,max_length,"question2")
     logger.info('Padding completed')
-    print(data["question1"])
 
     logger.info('Saving dataframe')
     data.to_csv(output_filepath,index=False,sep=";",encoding='utf-8')

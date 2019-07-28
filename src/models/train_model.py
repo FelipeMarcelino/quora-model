@@ -93,7 +93,6 @@ def test_model(test, model, criterion):
         f1_test =  truncate(f1_score(true_test,pred_test), fix_decimal)
         auc_test = truncate(auc(fpr,tpr), fix_decimal)
 
-        print(loss_test)
         return  loss_test,acc_test, f1_test, auc_test ,pred_test,true_test
 
 def save_model(model, optim, epoch, loss, learning_rate, model_name):
@@ -171,7 +170,6 @@ def train_model(train, test, model, epochs, learning_rate, model_name, date, bat
         test_report.write(str(ep) + ";" + str(loss_test) + ";" + str(acc_test) + ";" + str(f1_test) + ";" +
                            str(auc_test) + "\n")
 
-        print(loss_test)
         if acc_train > best_acc_train:
             best_acc_train = acc_train
 
@@ -263,7 +261,7 @@ def main(input_filepath,model_name,frac_sample,test_frac,batch_size, epochs, lea
     embedding_dim = 30
     layers = 2
     output_dim_fc1 = 50
-    vocab_size = len(word_dict)
+   vocab_size = len(word_dict) + 1
 
     # Dropout
     dropout = 0.5
