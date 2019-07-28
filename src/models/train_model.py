@@ -246,7 +246,7 @@ def main(input_filepath,model_name,frac_sample,test_frac,batch_size, epochs, lea
 
     # Create dataloader
     train = DataLoader(train_dataset,batch_size, shuffle=True)
-    test = DataLoader(test_dataset,len(test_dataset), shuffle=False)
+    test = DataLoader(test_dataset,batch_size, shuffle=False)
     """
         These dataloaders returns question1, q1_len, question2, q2_len and label
     """
