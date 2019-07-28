@@ -113,7 +113,7 @@ def train_model(train, test, model, epochs, learning_rate, model_name, date, bat
     criterion = nn.BCELoss()
 
     # Optimizer
-    optim = torch.optim.RMSprop(model.parameters(), lr=learning_rate)
+    optim = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     # Metrics important for binary classification
     best_acc_test = 0
@@ -223,6 +223,7 @@ def train_model(train, test, model, epochs, learning_rate, model_name, date, bat
 @click.option('--learning_rate', default=0.001, help="Learning rate")
 def main(input_filepath,model_name,frac_sample,test_frac,batch_size, epochs, learning_rate):
 
+    device = torch.device("cuda:0")
 
     model_name = model_name.replace(":","-")
     create_model_date = date.today().isoformat()
@@ -253,15 +254,15 @@ def main(input_filepath,model_name,frac_sample,test_frac,batch_size, epochs, lea
 
     # Creating model
     kernel_sizes = [3,5,7,9]
-    out_channels = 20
+    out_channels = 100
 
     # Using stride seems to be better than max_pooling layer
     stride = 2
-    hidden_size = 50
-    embedding_dim = 30
+    hidden_size = 150
+    embedding_dim = 100
     layers = 2
-    output_dim_fc1 = 50
-   vocab_size = len(word_dict) + 1
+    output_dim_fc1 = 100
+    vocab_size = len(word_dict) + 1
 
     # Dropout
     dropout = 0.5
