@@ -223,8 +223,6 @@ def train_model(train, test, model, epochs, learning_rate, model_name, date, bat
 @click.option('--learning_rate', default=0.001, help="Learning rate")
 def main(input_filepath,model_name,frac_sample,test_frac,batch_size, epochs, learning_rate):
 
-    device = torch.device("cuda:0")
-
     model_name = model_name.replace(":","-")
     create_model_date = date.today().isoformat()
 
@@ -247,7 +245,7 @@ def main(input_filepath,model_name,frac_sample,test_frac,batch_size, epochs, lea
 
     # Create dataloader
     train = DataLoader(train_dataset,batch_size, shuffle=True)
-    test = DataLoader(test_dataset,len(test_dataset), shuffle=False)
+    test = DataLoader(test_dataset,batch_size, shuffle=False)
     """
         These dataloaders returns question1, q1_len, question2, q2_len and label
     """
