@@ -261,7 +261,7 @@ def main(input_filepath,model_name,frac_sample,test_frac,batch_size, epochs, lea
     embedding_dim = 30
     layers = 2
     output_dim_fc1 = 50
-   vocab_size = len(word_dict) + 1
+    vocab_size = len(word_dict) + 1
 
     # Dropout
     dropout = 0.5
