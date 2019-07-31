@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 class QuoraModel(nn.Module):
     def __init__(self,kernel_sizes, out_channels, stride, hidden_size,layers, embedding_dim,output_dim_fc1, vocab_size,
-                 input_lstm, dropout):
+                 input_lstm, dropout, padding):
         super(QuoraModel, self).__init__()
 
         self.kernel_sizes = kernel_sizes
@@ -16,10 +16,8 @@ class QuoraModel(nn.Module):
         self.layers = layers
 
         self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx = 0,)
-        self.cnn_1 = nn.Conv1d(20,out_channels,kernel_sizes[0],stride,padding=1)
-        self.cnn_2 = nn.Conv1d(20,out_channels,kernel_sizes[1],stride,padding=2)
-        self.cnn_3 = nn.Conv1d(20,out_channels,kernel_sizes[2],stride,padding=3)
-        self.cnn_4 = nn.Conv1d(20,out_channels,kernel_sizes[3],stride,padding=3)
+        self.cnns = nn.ModuleList([nn.Conv1d(20,out_channels,kernel_sizes[i],stride,padding=padding[i]) for i in
+                                   range(len(kernel_sizes))])
         self.gru = nn.GRU(input_lstm,hidden_size,layers,dropout=dropout,batch_first=True,bidirectional=True)
         self.fc1 = nn.Linear(hidden_size * 2, output_dim_fc1) # 2 * because of bidirectional lstm
         self.fc2 = nn.Linear(output_dim_fc1 * 2,1)  # Concat representation between q1 and q2
@@ -31,17 +29,11 @@ class QuoraModel(nn.Module):
         embedding_output_q1 = self.embedding(questions1)
         embedding_output_q2 = self.embedding(questions2)
 
-        cnn_1_output_q1 = self.cnn_1(embedding_output_q1)
-        cnn_2_output_q1 = self.cnn_2(embedding_output_q1)
-        cnn_3_output_q1 = self.cnn_3(embedding_output_q1)
-        cnn_4_output_q1 = self.cnn_3(embedding_output_q1)
-        q1_cnn_cat = torch.tanh(torch.cat((cnn_1_output_q1,cnn_2_output_q1,cnn_3_output_q1,cnn_4_output_q1),dim=-1))
+        cnn_output_q1 = [torch.tanh(conv(embedding_output_q1)) for conv in self.cnns]
+        cnn_output_q2 = [torch.tanh(conv(embedding_output_q2)) for conv in self.cnns]
 
-        cnn_1_output_q2 = self.cnn_1(embedding_output_q2)
-        cnn_2_output_q2 = self.cnn_2(embedding_output_q2)
-        cnn_3_output_q2 = self.cnn_3(embedding_output_q2)
-        cnn_4_output_q2 = self.cnn_3(embedding_output_q2)
-        q2_cnn_cat = torch.tanh(torch.cat((cnn_1_output_q2,cnn_2_output_q2,cnn_3_output_q2,cnn_4_output_q2),dim=-1))
+        q1_cnn_cat = torch.cat(cnn_output_q1,dim=-1)
+        q2_cnn_cat = torch.cat(cnn_output_q2,dim=-1)
 
         # Batch normalization
         q1_cnn_cat = self.batch_norm(q1_cnn_cat)

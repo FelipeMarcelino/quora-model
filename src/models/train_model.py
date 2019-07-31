@@ -7,6 +7,7 @@ import pickle
 import matplotlib.pyplot as plt
 import torch.nn as nn
 import math
+import os
 from sklearn.metrics import accuracy_score, f1_score, auc, roc_curve
 from datetime import datetime, date
 from tqdm import trange
@@ -14,6 +15,52 @@ from tqdm import tqdm
 from src.models.create_dataset import QuoraDataset
 from src.models.model import  QuoraModel
 from torch.utils.data import DataLoader
+
+" Code copied from: https://stackoverflow.com/questions/48391777/nargs-equivalent-for-options-in-click"
+class OptionEatAll(click.Option):
+
+    def __init__(self, *args, **kwargs):
+        self.save_other_options = kwargs.pop('save_other_options', True)
+        nargs = kwargs.pop('nargs', -1)
+        assert nargs == -1, 'nargs, if set, must be -1 not {}'.format(nargs)
+        super(OptionEatAll, self).__init__(*args, **kwargs)
+        self._previous_parser_process = None
+        self._eat_all_parser = None
+
+    def add_to_parser(self, parser, ctx):
+
+        def parser_process(value, state):
+            # method to hook to the parser.process
+            done = False
+            value = [value]
+            if self.save_other_options:
+                # grab everything up to the next option
+                while state.rargs and not done:
+                    for prefix in self._eat_all_parser.prefixes:
+                        if state.rargs[0].startswith(prefix):
+                            done = True
+                    if not done:
+                        value.append(state.rargs.pop(0))
+            else:
+                # grab everything remaining
+                value += state.rargs
+                state.rargs[:] = []
+            value = tuple(value)
+
+            # call the actual process
+            self._previous_parser_process(value, state)
+
+        retval = super(OptionEatAll, self).add_to_parser(parser, ctx)
+        for name in self.opts:
+            our_parser = parser._long_opt.get(name) or parser._short_opt.get(name)
+            if our_parser:
+                self._eat_all_parser = our_parser
+                self._previous_parser_process = our_parser.process
+                our_parser.process = parser_process
+                break
+        return retval
+
+" Code copied from: https://stackoverflow.com/questions/48391777/nargs-equivalent-for-options-in-click"
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -24,10 +71,14 @@ pd.options.mode.chained_assignment = None  # default='warn'
 report_folder = "../../reports/"
 report_figure_folder = "../../reports/figures/"
 models_folder = "../../models/"
-index_file_model = "../../reports/index.csv"
+temp_index_models = "../../reports/index.csv"
 
 # Columns for reports files
-columns_report = ['epoch','acc','f1_score','loss','auc']
+report_columns = ['epoch','acc','f1_score','loss','auc']
+index_columns = \
+['id','model_name','date','loss_train(last)','loss_test(last)','acc_train','acc_test','auc_train','auc_test','f1_score_train','f1_score_test',\
+  'gpu','sample_size','test_frac','epochs','batch_size','learning_rate','optimizer','momentum', 'embedding_dim','stride_cnn','kernel_sizes',\
+ 'output_channel(filters)','hidden_size(lstm)','layers(lstm)','dense_linear_dim','dropout']
 
 # Truncate decimal
 fix_decimal = 4
@@ -37,11 +88,25 @@ def truncate(number, digits) -> float:
     stepper = 10.0 ** digits
     return math.trunc(stepper * number) / stepper
 
-def write_to_index(dict_index):
-    index_models = pd.read_csv(index_file_model,sep=";",header=0)
+def write_to_index(dict_index,index_file):
+    index_models = None
 
-    # It is necessary to reoder columns before saving the index models
-    cols = index_models.columns.values
+    if os.path.exists(index_file):
+        index_models = pd.read_csv(index_file,sep=";",header=0)
+    else:
+        temp_file = open(index_file,"w+")
+        for i,col in enumerate(index_columns):
+
+            temp_file.write(str(col))
+
+            if i + 1 != len(index_columns):
+                temp_file.write(";")
+            else:
+                temp_file.write("\n")
+
+        temp_file.close()
+        index_models = pd.read_csv(index_file,sep=";",header=0)
+
 
     dict_index['id'] = [len(index_models)]
 
@@ -57,10 +122,10 @@ def write_to_index(dict_index):
     index_models = pd.concat([index_models, temp], axis=0,sort=True)
 
     # Reordeing columns
-    index_models = index_models[cols]
+    index_models = index_models[index_columns]
 
     # Saving results
-    index_models.to_csv(index_file_model,sep=";",index=False)
+    index_models.to_csv(index_file,sep=";",index=False)
 
 def test_model(test, model, criterion):
 
@@ -107,13 +172,22 @@ def save_model(model, optim, epoch, loss, learning_rate, model_name):
             'learning_rate': learning_rate
             }, PATH)
 
-def train_model(train, test, model, epochs, learning_rate, model_name, date, batch_size, sample_size, test_frac):
+def train_model(train, test, model, epochs, learning_rate, model_name, date, batch_size, sample_size, test_frac,
+                index_file, optimizer,momentum, dict_index):
 
     # Loss function
     criterion = nn.BCELoss()
 
     # Optimizer
-    optim = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    if optimizer.lower() == "adam":
+        optim = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    elif optimizer.lower() == "sgd":
+        optim = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
+    elif optimizer.lower() == "rmsprop":
+        optim = torch.optim.RMSprop(model.parameters(), lr=learning_rate)
+    else:
+        print("Optimizer is not in list avaliable")
+        sys.exit(1)
 
     # Metrics important for binary classification
     best_acc_test = 0
@@ -124,8 +198,8 @@ def train_model(train, test, model, epochs, learning_rate, model_name, date, bat
     best_auc_train = 0
 
     # Create files for report each epoch of training process
-    train_report = open(report_folder + model_name + "_train.csv","a+")
-    test_report = open(report_folder + model_name + "_test.csv","a+")
+    train_report = open(report_folder + model_name + "_train.csv","w+")
+    test_report = open(report_folder + model_name + "_test.csv","w+")
 
     train_report.write("epoch;loss;acc;f1_score;auc\n")
     test_report.write("epoch;loss;acc;f1_score;auc\n")
@@ -190,23 +264,22 @@ def train_model(train, test, model, epochs, learning_rate, model_name, date, bat
             best_auc_test  = auc_test
 
 
-    dict_index = {}
     dict_index['model_name'] = [model_name]
     dict_index['date'] = [date]
-    dict_index['best_acc_train'] = [best_acc_train]
-    dict_index['best_acc_test'] = [best_acc_test]
+    dict_index['acc_train'] = [best_acc_train]
+    dict_index['acc_test'] = [best_acc_test]
     dict_index['loss_train(last)'] = [loss_ep]
     dict_index['loss_test(last)'] = [loss_test]
-    dict_index['best_f1_score_train'] = [best_f1_score_train]
-    dict_index['best_f1_score_test'] = [best_f1_score_test]
-    dict_index['best_auc_train'] = [best_auc_train]
-    dict_index['best_auc_test'] = [best_auc_test]
+    dict_index['f1_score_train'] = [best_f1_score_train]
+    dict_index['f1_score_test'] = [best_f1_score_test]
+    dict_index['auc_train'] = [best_auc_train]
+    dict_index['auc_test'] = [best_auc_test]
     dict_index['epochs'] = [epochs]
     dict_index['batch_size'] = [batch_size]
     dict_index['learning_rate'] = [learning_rate]
     dict_index['sample_size'] = [sample_size]
     dict_index['test_frac'] = [test_frac]
-    write_to_index(dict_index)
+    write_to_index(dict_index,index_file)
 
     train_report.close()
     test_report.close()
@@ -216,15 +289,31 @@ def train_model(train, test, model, epochs, learning_rate, model_name, date, bat
 @click.argument('input_filepath', type=click.Path(exists=True))
 # Use dateime.now as default name for model
 @click.option('--model_name',default=datetime.now().isoformat().split(".")[0], help="Model name to be saved")
+@click.option('--index_file',type=click.Path(exists=False),default="../../reports/index.csv")
 @click.option('--frac_sample',default=1.0, help="Fraction of sample train used to train the model")
 @click.option('--test_frac',default=0.2, help="Fraction of sample train used to test the model")
 @click.option('--batch_size',default=128, help="Batch size")
 @click.option('--epochs',default=10, help="Numbers of epochs to train the model")
 @click.option('--learning_rate', default=0.001, help="Learning rate")
-def main(input_filepath,model_name,frac_sample,test_frac,batch_size, epochs, learning_rate):
+@click.option('--embedding_dim', default=100, help="Embedding dim for words")
+@click.option('--kernel_sizes', cls=OptionEatAll, default=[2,3,5,7], help="Kernel sizes")
+@click.option('--out_channel', default=50, help="The number of filters(channels)")
+@click.option('--stride', default=50, help="Stride of cnn")
+@click.option('--layers_lstm', default=2, help="Number of layers of lstm")
+@click.option('--hidden_size', default=100, help="Hidden neurons in lstm layers")
+@click.option('--dense_size', default=100, help="Number of neurons in dense linear layer")
+@click.option('--dropout',default=0.5, help="Probability of dropout")
+@click.option('--optimizer',default='adam', help="Optmizer")
+@click.option('--momentum', default=0.0, help="Nesterov momentum sgd")
+def main(input_filepath,index_file,model_name,frac_sample,test_frac,batch_size, epochs, learning_rate,
+         embedding_dim,kernel_sizes, out_channel, stride, layers_lstm,hidden_size,dense_size,dropout, optimizer,
+         momentum):
 
     model_name = model_name.replace(":","-")
     create_model_date = date.today().isoformat()
+
+    kernel_sizes = [int(x) for x in kernel_sizes] # Transforming into ints numbers
+
 
     data = pd.read_csv(input_filepath,header=0,sep=";")
 
@@ -250,28 +339,31 @@ def main(input_filepath,model_name,frac_sample,test_frac,batch_size, epochs, lea
         These dataloaders returns question1, q1_len, question2, q2_len and label
     """
 
-    # Creating model
-    kernel_sizes = [3,5,7,9]
-    out_channels = 100
-
-    # Using stride seems to be better than max_pooling layer
-    stride = 2
-    hidden_size = 150
-    embedding_dim = 100
-    layers = 2
-    output_dim_fc1 = 100
-    vocab_size = len(word_dict) + 1
-
-    # Dropout
-    dropout = 0.5
+    padding = []
+    for p in range(len(kernel_sizes)):
+        padding.append(int((embedding_dim  - 1) * stride - embedding_dim - kernel_sizes[p]))
 
     # Some hiperparameters that will be deducted by the above 
-    input_lstm = int((((embedding_dim + 2 * 1 - 1 * (kernel_sizes[0] - 1) - 1)/stride) + 1)) * 4
+    input_lstm = int((((embedding_dim + 2 * padding[0] - 1 * (kernel_sizes[0] - 1) - 1)/stride) + 1)) * len(kernel_sizes)
+    vocab_size = len(word_dict) + 1
 
-    model = QuoraModel(kernel_sizes,out_channels,stride,hidden_size,layers,embedding_dim,output_dim_fc1,
-                       vocab_size, input_lstm, dropout).to(device)
+    model = QuoraModel(kernel_sizes,out_channel,stride,hidden_size,layers_lstm,embedding_dim, dense_size,
+                       vocab_size, input_lstm, dropout, padding).to(device)
 
-    train_model(train, test, model, epochs, learning_rate, model_name, create_model_date, batch_size, len(data), test_frac)
+    dict_index = {}
+    dict_index['dropout'] = [dropout]
+    dict_index['dense_linear_dim'] = [dense_size]
+    dict_index['layers(lstm)'] = [layers_lstm]
+    dict_index['hidden_size(lstm)'] = [hidden_size]
+    dict_index['output_channel(filters)'] = [out_channel]
+    dict_index['kernel_sizes'] = [kernel_sizes]
+    dict_index['stride_cnn'] = [stride]
+    dict_index['embedding_dim'] = [embedding_dim]
+    dict_index['optimizer'] = [optimizer]
+    dict_index['momentum'] = [momentum]
+
+    train_model(train, test, model, epochs, learning_rate, model_name, create_model_date, batch_size, len(data),
+                test_frac, index_file, optimizer, momentum, dict_index)
 
 if __name__ == "__main__":
     main()

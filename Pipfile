@@ -5,6 +5,8 @@ verify_ssl = true
 
 [dev-packages]
 bandit = "*"
+prospector = "*"
+black = "*"
 
 [packages]
 src = {editable = true,file = "file:///home/felipemarcelino/google_drive/Machine_Learning/projects/quora-model"}
