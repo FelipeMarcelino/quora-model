@@ -35,6 +35,9 @@ class QuoraModel(nn.Module):
         q1_cnn_cat = torch.cat(cnn_output_q1,dim=-1)
         q2_cnn_cat = torch.cat(cnn_output_q2,dim=-1)
 
+        q1_cnn_cat = torch.relu(q1_cnn_cat)
+        q2_cnn_cat = torch.relu(q2_cnn_cat)
+
         # Batch normalization
         q1_cnn_cat = self.batch_norm(q1_cnn_cat)
         q2_cnn_cat = self.batch_norm(q2_cnn_cat)
@@ -44,6 +47,9 @@ class QuoraModel(nn.Module):
 
         linear_output_q1 = self.fc1(lstm_output_q1[:,-1,:])
         linear_output_q2 = self.fc1(lstm_output_q2[:,-1,:])
+
+        linear_output_q1 = torch.relu(linear_output_q1)
+        linear_output_q2 = torch.relu(linear_output_q2)
 
         # Dropout to avoid overfitting
         linear_output_q1 = self.dropout(linear_output_q1)
