@@ -63,6 +63,7 @@ class OptionEatAll(click.Option):
 " Code copied from: https://stackoverflow.com/questions/48391777/nargs-equivalent-for-options-in-click"
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:0')
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
